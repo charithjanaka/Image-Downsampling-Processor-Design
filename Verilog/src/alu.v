@@ -1,40 +1,64 @@
-// Module: Program Counter
-// Author: M.M.C.J.Bandara - 180065C
-// 07/01/2022
+// Module: ALU
 
-module alu( clk, A, B, ALU_SEL, alu_out, zero_flag);  
+module alu( clk, RST, ALU_OP, a_in, b_in, alu_out, z_flag);  
 
-input clk;
-input [3:0] ALU_SEL;
-input [18:0] A;
-input [18:0] B;
+input wire clk;
+input wire RST;
+input [3:0] ALU_OP;
+input [18:0] a_in;
+input [18:0] b_in;
 
-output reg [18:0] alu_result = 19'b0;
-reg flag = 1'b0;
+output reg [18:0] alu_out = 19'b0;
+output reg z_flag = 1'b0;
 
-always @ (alu_result)
+reg z;
+
+always @ (posedge clk or posedge RST)
 begin
-    if (alu_result == 19'b0) zero_flag <= 1; else zero_flag = 0;
+    if (RST)
+        z_flag <= 1'b0;
+    else
+        z_flag <= z;
 end    
 
-always @ (posedge clk)
+always @ (a_in or b_in)
 begin
-    case (ALU_SEL)
+    case (ALU_OP)
         3'b000:                                         // INCR
-            alu_result <= A + 19'b0000000000000000001;
-        3'b001:                                         // ADDI & ADDR
-            alu_result <= A + B;
-        3'b010:                                         // SUBI & SUBR
-            alu_result <= A - B;
-        3'b011:                                         // SHL
-            alu_result <= A << B;
-        3'b100;                                         // SHR
-            alu_result <= A >> B;
-        3'b101:                                         // OR
-            alu_result <= A | B;
+            alu_out = a_in + 19'd1;
+        3'b001:                                         // ADDI
+            alu_out = a_in + b_in;
+        3'b010:begin                                    // SUBI
+            alu_out = a_in - b_in;
+            z = (alu_out == 19'b0);
+        end
+        3'b011:                                         // ADDR
+            alu_out = a_in + b_in;  
+        3'b100: begin                                   // SUBR
+            alu_out = a_in - b_in; 
+            z = (alu_out == 19'b0); 
+        end                  
+        3'b101:                                         // SHL
+            alu_out = a_in << b_in;
+        3'b110:                                         // SHR
+            alu_out = a_in >> b_in;
+        3'b111:                                         // OR
+            alu_out = a_in | b_in;
         default:
-            alu_result <= 19'b0; 
-    end
+            alu_out = 19'b0; 
+    endcase
 end
 
 endmodule
+
+//                                       ---------------------------------------------
+//                             clk----->|                                             |-----> c_out                  
+//                             RST----->|                                             |-----> z_flag                     
+//                                      |                                             |
+//                          ALU_OP----->|                                             |
+//                                      |                   ALU                       |
+//                            a_in----->|                                             |
+//                            b_in----->|                                             |
+//                                      |                                             |
+//                                      |                                             |
+//                                       ---------------------------------------------
