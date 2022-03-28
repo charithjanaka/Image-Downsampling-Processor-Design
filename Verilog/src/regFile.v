@@ -19,14 +19,12 @@ output wire [7:0] dm_data;           // Data memory write data output
 
 reg [18:0] regs[13:0];
 
-
-
 always @ (posedge clk or posedge RST)
 begin
     if (RST == 1)
         regs[RST_SEL] <= 19'b0;
-    else if (MEM_READ == 1)
-        regs[1] <= {{11{0}},mem_data[7:0]};
+    else if (MEM_READ == 2'b11)
+        regs[1] <= {11'b0, mem_data[7:0]};
     else
     begin
         if (C_EN == 1)

@@ -1,27 +1,31 @@
-// Module: Program Counter
-// Author: M.M.C.J.Bandara - 180065C
-// 06/01/2022
+// Module: Instruction Register
 
-module ir(
-    input clk,                  // Clock
-    input RST,                  // Reset
-    input instr,                // Instruction
-    output immediate,           // Immediate data output
-    output out                  // Output to controller
-);
+module ir( clk, RST, ir_in, immediate, ir_out);
+    
+input wire clk;                  // Clock
+input wire RST;                  // Reset
+input wire [7:0] ir_in;          // Instruction
+output wire [3:0] immediate;     // Immediate data output
+output reg ir_out = 8'b0;        // Output to controller
 
-reg [7:0] data;
-initial data = 8'b00000000;
-
-always @ (posedge clk)
+always @ (posedge clk or posedge RST)
 begin
     if (RST == 1)
-        data <= 8'b00000000;
+        ir_out <= 8'b0;
     else
-        data <= instr;
+        ir_out <= ir_in;
 end
 
-assign immediate = data;
-assign out = data;
+assign immediate = ir_out[3:0];
 
 endmodule
+
+//                                       ---------------------------------------------
+//                             clk----->|                                             |-----> ir_out                 
+//                             RST----->|                                             |-----> immediate
+//                                      |                                             |                    
+//                                      |             Instruction Register            |
+//                           ir_in----->|                                             |
+//                                      |                                             |
+//                                      |                                             |
+//                                       ---------------------------------------------
