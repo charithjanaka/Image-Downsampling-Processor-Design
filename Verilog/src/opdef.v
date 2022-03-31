@@ -22,6 +22,7 @@
 `define SHR         44
 `define SHR2        45
 `define JPNZ        48
+`define JPNZ2       49
 `define OR          52
 `define OR2         53
 `define NOOP        56

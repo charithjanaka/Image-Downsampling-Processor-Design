@@ -345,7 +345,88 @@ begin
             STATE       <=      `FETCH;
         end
 
-        
+        `JPNZ: begin
+            PCI         <=      1'b0;
+            RST         <=      `rst_none;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            MEM         <=      `mem_none;
+            IR_EN       <=      `ir_none;
+            BRANCH      <=      `branch_none;
+            MUX2_CTRL   <=      `mux2_none;
+
+            if (z_flag == 1) begin
+                STATE   <=      `JPNZ2;
+            end
+            else begin
+                STATE   <=      `FETCH;
+            end
+        end
+
+        `JPNZ2: begin
+            PCI         <=      1'b0;
+            RST         <=      `rst_none;
+            A_SEL       <=      instr[3:0];
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_pc;
+            ALU_OP      <=      `alu_abus;
+            MEM         <=      `mem_none;
+            IR_EN       <=      `ir_none;
+            BRANCH      <=      `branch_br;
+            MUX2_CTRL   <=      `mux2_none;
+
+            STATE       <=      `FETCH;
+        end
+
+        `OR: begin
+            PCI         <=      1'b0;
+            RST         <=      `rst_none;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            MEM         <=      `im_read;
+            IR_EN       <=      `ir_en;
+            BRANCH      <=      `branch_none;
+            MUX2_CTRL   <=      `mux2_none;
+
+            STATE       <=      `OR2;
+        end
+
+        `OR2: begin
+            PCI         <=      1'b1;
+            RST         <=      `rst_none;
+            A_SEL       <=      instr[7:4];
+            B_SEL       <=      instr[3:0];
+            C_SEL       <=      instr[7:4];
+            ALU_OP      <=      `alu_or;
+            MEM         <=      `mem_none;
+            IR_EN       <=      `ir_none;
+            BRANCH      <=      `branch_none;
+            MUX2_CTRL   <=      `mux2_none;
+
+            STATE       <=      `FETCH;
+        end
+
+        `NOOP: begin
+            PCI         <=      1'b0;
+            RST         <=      `rst_none;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            MEM         <=      `mem_none;
+            IR_EN       <=      `ir_none;
+            BRANCH      <=      `branch_none;
+            MUX2_CTRL   <=      `mux2_none;
+
+            STATE       <=      `FETCH;
+        end
+
+        default: STATE  <=      `END;
+
     endcase
 end
 

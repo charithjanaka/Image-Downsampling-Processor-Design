@@ -11,6 +11,7 @@
 
 // C_SEL control signals
 `define csel_none       4'b0000
+`define csel_pc         4'b1111
 
 // ALU control signals
 `define alu_none        4'b0000
