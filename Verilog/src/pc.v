@@ -1,9 +1,10 @@
 // Module: Program Counter
 
-module pc( clk, RST, addr_in, BRANCH, addr_out);
+module pc( clk, RST, PCI, addr_in, BRANCH, addr_out);
     
 input wire clk;                  // Clock
 input wire RST;                  // Reset
+input wire PCI;                  // PC Increment
 input wire [7:0] addr_in;        // Next instruction address input
 input wire BRANCH;               // Branch control signal
 
@@ -29,6 +30,7 @@ endmodule
 //                                       ---------------------------------------------
 //                             clk----->|                                             |-----> addr_out                 
 //                             RST----->|                                             |
+//                             PCI----->|                                             |
 //                          BRANCH----->|                                             |                    
 //                                      |              Program Counter                |
 //                         addr_in----->|                                             |

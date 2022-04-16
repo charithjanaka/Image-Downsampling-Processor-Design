@@ -184,7 +184,7 @@ begin
             PCI         <=      1'b1;
             RST         <=      `rst_none;
             A_SEL       <=      instr[7:4];
-            B_SEL       <=      `bsel_none;
+            B_SEL       <=      `bsel_mux;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_addi;
             MEM         <=      `mem_none;
@@ -244,7 +244,7 @@ begin
             PCI         <=      1'b1;
             RST         <=      `rst_none;
             A_SEL       <=      instr[7:4];
-            B_SEL       <=      `bsel_none;
+            B_SEL       <=      `bsel_mux;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_subi;
             MEM         <=      `mem_none;

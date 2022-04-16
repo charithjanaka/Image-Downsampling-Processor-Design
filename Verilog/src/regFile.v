@@ -28,7 +28,7 @@ begin
     else
     begin
         if (C_EN == 1)
-            regs[C_SEL] <= c_in;
+            regs[C_SEL-4'b0] <= c_in;
     end
 end
 
@@ -55,3 +55,12 @@ endmodule
 //                        mem_data----->|                                             |
 //                                      |                                             |
 //                                       ---------------------------------------------
+
+
+// 0 - DMAR
+// 1 - DMDR
+// 2 - R0
+// 3 - R1
+// :
+// :
+// 13 - R11
