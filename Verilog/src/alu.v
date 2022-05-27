@@ -44,7 +44,7 @@ begin
             alu_out = a_in >> b_in;
         4'b1000:                                         // OR
             alu_out = a_in | b_in;
-        4'b1001;                                         // A Bus
+        4'b1001:                                         // A Bus
             alu_out = a_in;
         default:
             alu_out = 19'b0; 
