@@ -1,57 +1,62 @@
 // Module: ALU
 
+`include "aluopdef.v"
+
 module alu( clk, RST, ALU_OP, a_in, b_in, alu_out, z_flag);  
 
 input wire clk;
 input wire RST;
-input [3:0] ALU_OP;
-input [18:0] a_in;
-input [18:0] b_in;
+input wire [3:0] ALU_OP;
+input wire [18:0] a_in;
+input wire [18:0] b_in;
 
-output reg [18:0] alu_out = 19'b0;
-output reg z_flag = 1'b0;
+output wire [18:0] alu_out;
+output wire z_flag;
 
-reg z;
+reg [18:0] alu_tmp;
 
-always @ (posedge clk or posedge RST)
+always @ (posedge clk)
 begin
-    if (RST)
-        z_flag <= 1'b0;
-    else
-        z_flag <= z;
-end    
 
-always @ (a_in or b_in)
-begin
+    if (RST) begin
+        alu_tmp <= 19'b0;
+    end
+
     case (ALU_OP)
-        4'b0001:                                         // INCR
-            alu_out = a_in + 19'd1;
-        4'b0010:                                         // ADDI
-            alu_out = a_in + b_in;
-        4'b0011:begin                                    // SUBI
-            alu_out = a_in - b_in;
-            z = (alu_out == 19'b0);
-        end
-        4'b0100:                                         // ADDR
-            alu_out = a_in + b_in;  
-        4'b0101: begin                                   // SUBR
-            alu_out = a_in - b_in; 
-            z = (alu_out == 19'b0); 
-        end                  
-        4'b0110:                                         // SHL
-            alu_out = a_in << b_in;
-        4'b0111:                                         // SHR
-            alu_out = a_in >> b_in;
-        4'b1000:                                         // OR
-            alu_out = a_in | b_in;
-        4'b1001:                                         // A Bus
-            alu_out = a_in;
+        `INCR:                                         
+            alu_tmp <= a_in + 19'd1;
+        `ADDI:                                        
+            alu_tmp <= a_in + b_in;
+        `SUBI:                                       
+            alu_tmp <= a_in - b_in;
+        `ADDR:                                        
+            alu_tmp <= a_in + b_in;  
+        `SUBR:                                         
+            alu_tmp <= a_in - b_in;                
+        `SHL:                                         
+            alu_tmp <= a_in << b_in;
+        `SHR:                                        
+            alu_tmp <= a_in >> b_in;
+        `OR:                                         
+            alu_tmp <= a_in | b_in;
+        `ABUS:                                        
+            alu_tmp <= a_in;
         default:
-            alu_out = 19'b0; 
+            alu_tmp <= 19'b0; 
     endcase
 end
 
+assign alu_out = alu_tmp;
+assign z_flag = (alu_tmp == 0);
+
 endmodule
+
+
+
+
+
+
+
 
 //                                       ---------------------------------------------
 //                             clk----->|                                             |-----> c_out                  
