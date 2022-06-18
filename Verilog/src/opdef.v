@@ -1,6 +1,6 @@
 // OP Code Encoding Definitions
 
-`define END         0
+`define ENDP        0
 `define FETCH       1
 `define FETCH2      2
 `define CLR         4

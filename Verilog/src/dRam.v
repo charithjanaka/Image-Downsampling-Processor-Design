@@ -17,6 +17,7 @@ begin
     else
         d_out <= dRAM[dAddr]; 
 end
+endmodule
 
 //                                       ---------------------------------------------
 //                             clk----->|                                             |-----> d_out               

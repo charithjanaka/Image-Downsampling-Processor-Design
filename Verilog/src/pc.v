@@ -18,10 +18,10 @@ begin
     begin
         if (BRANCH == 1)
             addr_out <= addr_in;
-        else if (PCI)
-            addr_out <= addr_out + 8'b1;
+        else if (PCI == 1)
+            addr_out <= addr_out + 8'b00000001;
         else
-            addr_out <= addr_out; 
+            addr_out = addr_out; 
     end
 end
 

@@ -6,7 +6,7 @@ input wire clk;                  // Clock
 input wire RST;                  // Reset
 input wire [7:0] ir_in;          // Instruction
 output wire [3:0] immediate;     // Immediate data output
-output reg ir_out = 8'b0;        // Output to controller
+output reg [7:0] ir_out;        // Output to controller
 
 always @ (posedge clk or posedge RST)
 begin

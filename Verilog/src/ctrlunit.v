@@ -24,7 +24,7 @@ output reg [5:0] STATE = 6'd0;                  // Present state of the state ma
 always @ (posedge clk)
 begin
     case (STATE)
-        `END:begin
+        `ENDP:begin
             PCI         <=      1'b0;
             RST         <=      `rst_none;
             A_SEL       <=      `asel_none;

@@ -1,4 +1,4 @@
-// Register file test bench
+// ALU test bench
 
 `timescale 1 ns / 100 ps
 
