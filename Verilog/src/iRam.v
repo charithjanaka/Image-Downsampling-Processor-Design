@@ -4,8 +4,8 @@ module iRam (clk, iAddr, instr, FETCH);
 
 input wire clk;                 // Clock
 input wire [7:0] iAddr;         // Instruction Address
-input wire FETCH;               // FETCH Control Signal
-output reg [7:0] instr = 8'b0;  // Instruction Output
+input wire [1:0] FETCH;         // FETCH Control Signal
+output reg [7:0] instr;         // Instruction Output
 
 reg [7:0] iRAM [255:0];         // Instruction Memory -> 256 bytes
 
@@ -20,7 +20,7 @@ end
 
 always @ (posedge clk)
 begin
-    if (FETCH) begin
+    if (FETCH == 2'b01) begin
         instr <= iRAM [iAddr];
     end
 end

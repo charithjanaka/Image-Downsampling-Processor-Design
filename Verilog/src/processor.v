@@ -1,98 +1,98 @@
 // Module: Processor
 
-module processor (clk, status);
+module processor (clk, read_data, instr, next_instr_addr, write_addr, write_data, MEM, STATE, status);
 
 input wire clk;
-input wire [1:0] status;
+input wire processor_start;
+input wire [7:0] read_data;
+input wire [7:0] instr;
 
-// Instruction Menory connections
-wire [7:0] iAddr;
-wire FETCH;
-wire [7:0] instr;
+output wire [7:0] next_instr_addr;
+output wire [18:0] write_addr;
+output wire [7:0] write_data;
+output wire [1:0] MEM;
+output wire [5:0] STATE;
+output wire status;
 
-// Data Memory connections
-wire [18:0] dAddr;
-wire [7:0] d_in;
-wire MEM_WRITE;
-wire d_out;
+// Buses
+wire [18:0] a_bus;
+wire [18:0] b_bus;
+wire [18:0] c_bus;
+wire z_bus;
 
-// A-Bus connections
-wire [3:0] A_SEL;
-wire [18:0] DMAR_A;
-wire [18:0] DMDR_A;
-wire [18:0] R0_A;
-wire [18:0] R1_A;
-wire [18:0] R2_A;
-wire [18:0] R3_A;
-wire [18:0] R4_A;
-wire [18:0] R5_A;
-wire [18:0] R6_A;
-wire [18:0] R7_A;
-wire [18:0] R8_A;
-wire [18:0] R9_A;
-wire [18:0] R10_A;
-wire [18:0] R11_A;
-wire [18:0] a_out_A;
-
-// B-Bus connections
-wire [3:0] B_SEL;
-wire [18:0] DMAR_B;
-wire [18:0] DMDR_B;
-wire [18:0] R0_B;
-wire [18:0] R1_B;
-wire [18:0] R2_B;
-wire [18:0] R3_B;
-wire [18:0] R4_B;
-wire [18:0] R5_B;
-wire [18:0] R6_B;
-wire [18:0] R7_B;
-wire [18:0] R8_B;
-wire [18:0] R9_B;
-wire [18:0] R10_B;
-wire [18:0] R11_B;
-wire [18:0] b_out_B;
-
-// ALU connections
+// Interconnect wires - Ctrl Signals          
+wire PCI;  
+wire [3:0] RST_SEL; 
 wire RST_ALU;
-wire [3:0] ALU_OP;
-wire [18:0] a_in;
-wire [18:0] b_in;
-wire [18:0] alu_out;
-wire z_flag;
+wire RST_IR;
+wire RST_PC; 
+wire [3:0] A_SEL;                       
+wire [3:0] B_SEL;                       
+wire [3:0] C_SEL;                         
+wire [3:0] ALU_OP;                                              
+wire IR_EN;                            
+wire BRANCH;                       
+wire [1:0] MUX2_CTRL;                    
 
-// Instruction Register connections
-wire RST_IR;                 
+// Interconnect wires - Other
 wire [3:0] immediate;
-wire ir_out; 
-
-// PC connections
-wire RST_PC;              
-wire PCI;                  
-wire [7:0] addr_in_pc;
-wire BRANCH;
-
-// Register File connections
-wire RST_REG;                     
-wire [3:0] RST_SEL;
-wire C_EN;                  
-wire [3:0] C_SEL;
-wire [18:0] c_in;             
-wire MEM_READ;              
-wire [7:0] mem_data;
-output wire [18:0] a_out;            // a bus output
-output wire [18:0] b_out;            // b bus output
-output wire [18:0] dm_addr;          // Data memory address output
-output wire [7:0] dm_data;           // Data memory write data output
-
-// Control Unit connections                                                                                 
-wire [3:0] RST_REG;                                            
-wire [3:0] C_SEL;                                  
-wire MEM = 2'b0;                                                              
-wire [1:0] MUX2_CTRL;                         
-
+wire [7:0] ir_out;           
+wire [7:0] jump_addr;                                                                                                                                                  
+                               
 // Instantiate Modules
+alu alu_(
+            .clk(clk), 
+            .RST(RST_ALU), 
+            .ALU_OP(ALU_OP), 
+            .a_in(a_bus), 
+            .b_in(b_bus), 
+            .alu_out(c_bus), 
+            .z_flag(z_bus));
 
-// 
-iRam iram (.clk(clk), .iAddr(iAddr), .FETCH(FETCH), .instr(instr));
+ctrlunit ctrlunit_(
+                    .clk(clk), 
+                    .start(processor_start),
+                    .instr(ir_out), 
+                    .z_flag(z_bus), 
+                    .status(status), 
+                    .RST_SEL(RST_SEL), 
+                    .RST_ALU(RST_ALU), 
+                    .RST_IR(RST_IR), 
+                    .RST_PC(RST_PC), 
+                    .A_SEL(A_SEL), 
+                    .B_SEL(B_SEL), 
+                    .C_SEL(C_SEL), 
+                    .ALU_OP(ALU_OP), 
+                    .MEM(MEM), 
+                    .BRANCH(BRANCH), 
+                    .MUX2_CTRL(MUX2_CTRL));
+                    
+ir ir_(
+        .clk(clk), 
+        .RST(RST_IR), 
+        .ir_in(instr), 
+        .immediate(immediate), 
+        .ir_out(ir_out));
 
+pc pc_(
+        .clk(clk), 
+        .RST(RST_PC), 
+        .PCI(PCI), 
+        .addr_in(jump_addr), 
+        .BRANCH(BRANCH), 
+        .addr_out(next_instr_addr));
+
+regFile regfle_(
+                    .clk(clk), 
+                    .RST_SEL(RST_SEL), 
+                    .C_SEL(C_SEL), 
+                    .c_in(c_bus), 
+                    .A_SEL(A_SEL), 
+                    .B_SEL(B_SEL), 
+                    .MEM(MEM), 
+                    .mem_data(read_data),
+                    .a_out(a_bus), 
+                    .b_out(b_bus), 
+                    .dm_addr(write_addr), 
+                    .dm_data(write_data));
 endmodule

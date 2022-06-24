@@ -3,30 +3,37 @@
 `include "opdef.v"
 `include "ctrlsigdef.v"
 
-module ctrlunit (clk, instr, z_flag, status, RST, A_SEL, B_SEL, C_SEL, ALU_OP, MEM_WRITE, BRANCH, MUX2_CTRL, STATE);
+module ctrlunit (clk, start, instr, z_flag, status, RST_SEL, RST_ALU, RST_IR, RST_PC, A_SEL, B_SEL, C_SEL, ALU_OP, MEM_WRITE, BRANCH, MUX2_CTRL);
 
 input wire clk;                                 // Clock
+input wire strat;                               // Processor start signal
 input wire [7:0] instr;                         // Instruction
 input wire z_flag;                              // Zero Flag
-input wire [1:0] status;                        // Status of the processor
-output reg PCI = 1'b0;                          // PC increment control signal
-output reg [3:0] RST = 4'b0;                    // Register reset control signal
-output reg [3:0] A_SEL = 4'b0;                  // Register select to A bus control signal
-output reg [3:0] B_SEL = 4'b0;                  // Register select to B bus control signal
-output reg [3:0] C_SEL = 4'b0;                  // Register to be written from C bus select control signal
-output reg [3:0] ALU_OP = 4'b0;                 // ALU operation control signal
-output reg MEM = 2'b0;                          // Memory control signal
-output reg IR_EN = 1'b0;                        // Instruction register write enable control signal
-output reg BRANCH = 1'b0;                       // Branch control signal
-output reg [1:0] MUX2_CTRL = 2'b0;              // Mux2 control signal
-output reg [5:0] STATE = 6'd0;                  // Present state of the state machine
+input wire status;                              // Status of the processor
+output reg PCI;                                 // PC increment control signal
+output reg [3:0] RST_SEL;                       // Register reset control signal
+output wire RST_ALU;                            // ALU reset control signal
+output wire RST_IR;                             // IR reset control signal
+output wire RST_PC;                             // PC reset control signal
+output reg [3:0] A_SEL;                         // Register select to A bus control signal
+output reg [3:0] B_SEL;                         // Register select to B bus control signal
+output reg [3:0] C_SEL;                         // Register to be written from C bus select control signal
+output reg [3:0] ALU_OP;                        // ALU operation control signal
+output reg [1:0] MEM;                           // Memory control signal
+output reg IR_EN;                               // Instruction register write enable control signal
+output reg BRANCH;                              // Branch control signal
+output reg [1:0] MUX2_CTRL;                     // Mux2 control signal
+output reg [5:0] STATE;                         // Present state of the state machine
 
 always @ (posedge clk)
 begin
     case (STATE)
         `ENDP:begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -36,18 +43,20 @@ begin
             BRANCH      <=      `branch_none;
             MUX2_CTRL   <=      `mux2_none;
 
-            if (status == 2'b01) begin
+            if (start) begin
                 STATE   <=      `FETCH;
-                status  <=      2'b10;
+                status  <=      1;
             end
-            else begin
-                status  <=      2'b00;
-            end
+            else status <=      0;
         end
+    
 
         `FETCH:begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -62,7 +71,10 @@ begin
 
         `FETCH2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -77,7 +89,10 @@ begin
 
         `CLR: begin
             PCI         <=      1'b0;
-            RST         <=      instr[3:0];
+            RST_SEL     <=      instr[3:0];
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -92,7 +107,10 @@ begin
 
         `LOAD: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -107,7 +125,10 @@ begin
 
         `STORE: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -122,7 +143,10 @@ begin
 
         `COPY: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;                 // COPY R1, R2 ; R1 <= R2
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -137,7 +161,10 @@ begin
 
         `COPY2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[3:0];
             B_SEL       <=      `bsel_none;
             C_SEL       <=      instr[7:4];
@@ -152,7 +179,10 @@ begin
 
         `INCR: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[3:0];
             B_SEL       <=      `bsel_none;
             C_SEL       <=      instr[3:0];
@@ -167,7 +197,10 @@ begin
 
         `ADDI: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -182,7 +215,10 @@ begin
 
         `ADDI2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
             B_SEL       <=      `bsel_mux;
             C_SEL       <=      instr[7:4];
@@ -197,7 +233,10 @@ begin
 
         `ADDR: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -213,6 +252,9 @@ begin
         `ADDR2: begin
             PCI         <=      1'b1;
             RST         <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
             B_SEL       <=      instr[3:0];
             C_SEL       <=      instr[7:4];
@@ -227,7 +269,10 @@ begin
 
         `SUBI: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -242,7 +287,10 @@ begin
 
         `SUBI2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
             B_SEL       <=      `bsel_mux;
             C_SEL       <=      instr[7:4];
@@ -257,7 +305,10 @@ begin
 
         `SUBR: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -272,7 +323,10 @@ begin
 
         `SUBR2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
             B_SEL       <=      instr[3:0];
             C_SEL       <=      instr[7:4];
@@ -287,7 +341,10 @@ begin
 
         `SHL: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -302,7 +359,10 @@ begin
 
         `SHL2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
             B_SEL       <=      `bsel_none;
             C_SEL       <=      instr[7:4];
@@ -317,7 +377,10 @@ begin
 
         `SHR: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -332,7 +395,10 @@ begin
 
         `SHR2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
             B_SEL       <=      `bsel_none;
             C_SEL       <=      instr[7:4];
@@ -347,7 +413,10 @@ begin
 
         `JPNZ: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -367,7 +436,10 @@ begin
 
         `JPNZ2: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[3:0];
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_pc;
@@ -382,7 +454,10 @@ begin
 
         `OR: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -397,7 +472,10 @@ begin
 
         `OR2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
             B_SEL       <=      instr[3:0];
             C_SEL       <=      instr[7:4];
@@ -412,7 +490,10 @@ begin
 
         `NOOP: begin
             PCI         <=      1'b0;
-            RST         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
@@ -424,9 +505,7 @@ begin
 
             STATE       <=      `FETCH;
         end
-
-        default: STATE  <=      `END;
-
+        default: STATE  <=      `ENDP;
     endcase
 end
 
