@@ -15,6 +15,7 @@ wire [7:0]  d_ram_data_in_bus;
 wire [7:0]  d_ram_data_out_bus;
 
 // Commom wires for Ins & Data memory
+wire i_fetch;
 wire [1:0] mem_ctrl_bus;
 
 // Processor related wires
@@ -27,7 +28,7 @@ iRam iRam_(
             .clk(clk), 
             .iAddr(i_ram_address_bus), 
             .instr(i_ram_data_bus), 
-            .FETCH(mem_ctrl_bus));
+            .FETCH(i_fetch));
 
 dRam dRam_(
             .clk(clk), 
@@ -37,12 +38,14 @@ dRam dRam_(
             .d_out(d_ram_data_out_bus));
 
 processor processor_(
-            .clk(clk), 
+            .clk(clk),
+            .processor_start(power_ON), 
             .read_data(d_ram_data_out_bus), 
             .instr(i_ram_data_bus), 
             .next_instr_addr(i_ram_address_bus), 
             .write_addr(d_ram_address_bus), 
             .write_data(d_ram_data_in_bus), 
+            .IFETCH(i_fetch),
             .MEM(mem_ctrl_bus), 
             .STATE(processor_STATE_bus), 
             .status(processor_status));

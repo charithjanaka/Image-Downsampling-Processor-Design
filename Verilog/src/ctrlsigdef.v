@@ -28,7 +28,6 @@
 
 // Memory control signals
 `define mem_none        2'b00
-`define im_read         2'b01
 `define dm_write        2'b10
 `define dm_read         2'b11
 

@@ -8,7 +8,7 @@ input wire [7:0] ir_in;          // Instruction
 output wire [3:0] immediate;     // Immediate data output
 output reg [7:0] ir_out;        // Output to controller
 
-always @ (posedge clk or posedge RST)
+always @ (*)
 begin
     if (RST == 1)
         ir_out <= 8'b0;

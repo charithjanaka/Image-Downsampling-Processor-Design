@@ -15,7 +15,7 @@ output wire z_flag;
 
 reg [18:0] alu_tmp;
 
-always @ (posedge clk)
+always @ (*)
 begin
 
     if (RST) begin

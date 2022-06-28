@@ -6,9 +6,14 @@ input wire clk;                 // Clock
 input wire [18:0] dAddr;        // Data Address
 input wire [7:0] d_in;          // Data to be written
 input wire [1:0] MEM_WRITE;     // Memory Write control signal
-output reg [7:0] d_out = 8'b0;  // Data Memory Output
+output reg [7:0] d_out;         // Data Memory Output
 
-reg [7:0] dRAM [262144:0];      // Data Memory -> 262145 bytes
+reg [7:0] dRAM [524288:0];      // Data Memory -> 262145 bytes
+
+initial begin
+    dRAM[0] = 8'b00000010;
+    dRAM[1] = 8'b00000011;
+end
 
 always @ (posedge clk)
 begin

@@ -1,6 +1,6 @@
 // Module: Processor
 
-module processor (clk, read_data, instr, next_instr_addr, write_addr, write_data, MEM, STATE, status);
+module processor (clk, processor_start, read_data, instr, next_instr_addr, write_addr, write_data, IFETCH, MEM, STATE, status);
 
 input wire clk;
 input wire processor_start;
@@ -10,6 +10,7 @@ input wire [7:0] instr;
 output wire [7:0] next_instr_addr;
 output wire [18:0] write_addr;
 output wire [7:0] write_data;
+output wire IFETCH;
 output wire [1:0] MEM;
 output wire [5:0] STATE;
 output wire status;
@@ -29,10 +30,8 @@ wire RST_PC;
 wire [3:0] A_SEL;                       
 wire [3:0] B_SEL;                       
 wire [3:0] C_SEL;                         
-wire [3:0] ALU_OP;                                              
-wire IR_EN;                            
-wire BRANCH;                       
-wire [1:0] MUX2_CTRL;                    
+wire [3:0] ALU_OP;                                                                        
+wire BRANCH;                                         
 
 // Interconnect wires - Other
 wire [3:0] immediate;
@@ -54,7 +53,8 @@ ctrlunit ctrlunit_(
                     .start(processor_start),
                     .instr(ir_out), 
                     .z_flag(z_bus), 
-                    .status(status), 
+                    .status(status),
+                    .PCI(PCI), 
                     .RST_SEL(RST_SEL), 
                     .RST_ALU(RST_ALU), 
                     .RST_IR(RST_IR), 
@@ -63,9 +63,10 @@ ctrlunit ctrlunit_(
                     .B_SEL(B_SEL), 
                     .C_SEL(C_SEL), 
                     .ALU_OP(ALU_OP), 
+                    .IFETCH(IFETCH),
                     .MEM(MEM), 
                     .BRANCH(BRANCH), 
-                    .MUX2_CTRL(MUX2_CTRL));
+                    .STATE(STATE));
                     
 ir ir_(
         .clk(clk), 

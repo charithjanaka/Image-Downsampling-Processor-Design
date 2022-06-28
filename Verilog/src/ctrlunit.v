@@ -3,26 +3,25 @@
 `include "opdef.v"
 `include "ctrlsigdef.v"
 
-module ctrlunit (clk, start, instr, z_flag, status, RST_SEL, RST_ALU, RST_IR, RST_PC, A_SEL, B_SEL, C_SEL, ALU_OP, MEM_WRITE, BRANCH, MUX2_CTRL);
+module ctrlunit (clk, start, instr, z_flag, status,PCI, RST_SEL, RST_ALU, RST_IR, RST_PC, A_SEL, B_SEL, C_SEL, ALU_OP, IFETCH, MEM, BRANCH, STATE);
 
 input wire clk;                                 // Clock
-input wire strat;                               // Processor start signal
+input wire start;                               // Processor start signal
 input wire [7:0] instr;                         // Instruction
 input wire z_flag;                              // Zero Flag
-input wire status;                              // Status of the processor
+output reg status;                              // Status of the processor
 output reg PCI;                                 // PC increment control signal
 output reg [3:0] RST_SEL;                       // Register reset control signal
-output wire RST_ALU;                            // ALU reset control signal
-output wire RST_IR;                             // IR reset control signal
-output wire RST_PC;                             // PC reset control signal
+output reg RST_ALU;                             // ALU reset control signal
+output reg RST_IR;                              // IR reset control signal
+output reg RST_PC;                              // PC reset control signal
 output reg [3:0] A_SEL;                         // Register select to A bus control signal
 output reg [3:0] B_SEL;                         // Register select to B bus control signal
 output reg [3:0] C_SEL;                         // Register to be written from C bus select control signal
 output reg [3:0] ALU_OP;                        // ALU operation control signal
+output reg IFETCH;                              // Instruction Fetch Control signal
 output reg [1:0] MEM;                           // Memory control signal
-output reg IR_EN;                               // Instruction register write enable control signal
 output reg BRANCH;                              // Branch control signal
-output reg [1:0] MUX2_CTRL;                     // Mux2 control signal
 output reg [5:0] STATE;                         // Present state of the state machine
 
 always @ (posedge clk)
@@ -33,15 +32,14 @@ begin
             RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
             RST_IR      <=      1'b0;
-            RST_PC      <=      1'b0;
+            RST_PC      <=      1'b1;
             A_SEL       <=      `asel_none;
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             if (start) begin
                 STATE   <=      `FETCH;
@@ -61,10 +59,26 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
+
+            STATE       <=      `FETCH1;
+        end
+
+        `FETCH1:begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
 
             STATE       <=      `FETCH2;
         end
@@ -79,10 +93,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      {2'b0, instr[7:4]};
         end
@@ -97,10 +110,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `FETCH;
         end
@@ -115,13 +127,13 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
             MEM         <=      `dm_read;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `FETCH;
         end
+
 
         `STORE: begin
             PCI         <=      1'b0;
@@ -133,10 +145,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
             MEM         <=      `dm_write;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `FETCH;
         end
@@ -151,15 +162,31 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `COPY2;
         end
 
         `COPY2: begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
+
+            STATE       <=      `COPY3;
+        end
+
+        `COPY3: begin
             PCI         <=      1'b1;
             RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
@@ -169,10 +196,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_abus;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `FETCH;
         end
@@ -187,10 +213,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      instr[3:0];
             ALU_OP      <=      `alu_incr;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `FETCH;
         end
@@ -205,10 +230,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `ADDI2;
         end
@@ -220,13 +244,12 @@ begin
             RST_IR      <=      1'b0;
             RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
-            B_SEL       <=      `bsel_mux;
+            B_SEL       <=      `bsel_imm;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_addi;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_imm;
 
             STATE       <=      `FETCH;
         end
@@ -241,17 +264,16 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `ADDR2;
         end
 
         `ADDR2: begin
             PCI         <=      1'b1;
-            RST         <=      `rst_none;
+            RST_SEL         <=      `rst_none;
             RST_ALU     <=      1'b0;
             RST_IR      <=      1'b0;
             RST_PC      <=      1'b0;
@@ -259,10 +281,9 @@ begin
             B_SEL       <=      instr[3:0];
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_addr;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `FETCH;
         end
@@ -277,10 +298,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `SUBI2;
         end
@@ -292,13 +312,12 @@ begin
             RST_IR      <=      1'b0;
             RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
-            B_SEL       <=      `bsel_mux;
+            B_SEL       <=      `bsel_imm;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_subi;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_imm;
 
             STATE       <=      `FETCH;
         end
@@ -313,10 +332,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `SUBR2;
         end
@@ -331,10 +349,9 @@ begin
             B_SEL       <=      instr[3:0];
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_subr;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `FETCH;
         end
@@ -349,10 +366,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `SHL2;
         end
@@ -367,10 +383,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_shl;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_imm;
 
             STATE       <=      `FETCH;
         end
@@ -385,10 +400,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `SHR2;
         end
@@ -403,10 +417,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_shr;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_imm;
 
             STATE       <=      `FETCH;
         end
@@ -421,10 +434,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
-            BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
+            BRANCH      <=      `branch_none;  
 
             if (z_flag == 1) begin
                 STATE   <=      `JPNZ2;
@@ -444,10 +456,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_pc;
             ALU_OP      <=      `alu_abus;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
             BRANCH      <=      `branch_br;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `FETCH;
         end
@@ -462,10 +473,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
-            MEM         <=      `im_read;
-            IR_EN       <=      `ir_en;
+            IFETCH      <=      1'b1;
+            MEM         <=      `mem_none;
             BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
 
             STATE       <=      `OR2;
         end
@@ -480,10 +490,9 @@ begin
             B_SEL       <=      instr[3:0];
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_or;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
-            BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
+            BRANCH      <=      `branch_none;  
 
             STATE       <=      `FETCH;
         end
@@ -498,10 +507,9 @@ begin
             B_SEL       <=      `bsel_none;
             C_SEL       <=      `csel_none;
             ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
             MEM         <=      `mem_none;
-            IR_EN       <=      `ir_none;
-            BRANCH      <=      `branch_none;
-            MUX2_CTRL   <=      `mux2_none;
+            BRANCH      <=      `branch_none;    
 
             STATE       <=      `FETCH;
         end

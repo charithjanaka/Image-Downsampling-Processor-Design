@@ -15,7 +15,7 @@ REG = {"DMAR":"0001", "DMDR":"0010", "R0":"0011", "R1":"0100", "R2":"0101", "R3"
 instrs = []
 
 # Reading Assembly Code
-AssemblyCode = open("assembly.txt","r")
+AssemblyCode = open("test.txt","r")
 instrs = AssemblyCode.read().splitlines() 
 
 # Generating Machine Code
@@ -33,15 +33,15 @@ for instr in instrs:
         MachineCode.write(mIns + "\n")
         #print(mIns)
     else:                                                   # Three Operand Instructions
-        mIns_1 = ISA[OP[0]] + REG[OP[1]]
+        mIns_1 = ISA[OP[0]] + "0000"
         MachineCode.write(mIns_1 + "\n")
         #print(mIns_1)
         if (OP[2] in REG):                                  # Case I - Third operand is a Register
-            mIns_2 = "0000" + REG[OP[2]]
+            mIns_2 = REG[OP[1]] + REG[OP[2]]
             MachineCode.write(mIns_2 + "\n")
             #print(mIns_2)
         else:                                               # Case II - Third operand is an immediate
-            mIns_3 = "0000" + decTObin(int(OP[2]))
+            mIns_3 = REG[OP[1]] + decTObin(int(OP[2]))
             MachineCode.write(mIns_2 + "\n")
             #print(mIns_3)
 
