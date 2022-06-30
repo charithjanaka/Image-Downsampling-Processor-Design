@@ -35,8 +35,7 @@ wire BRANCH;
 
 // Interconnect wires - Other
 wire [3:0] immediate;
-wire [7:0] ir_out;           
-wire [7:0] jump_addr;                                                                                                                                                  
+wire [7:0] ir_out;                                                                                                                                                         
                                
 // Instantiate Modules
 alu alu_(
@@ -79,7 +78,7 @@ pc pc_(
         .clk(clk), 
         .RST(RST_PC), 
         .PCI(PCI), 
-        .addr_in(jump_addr), 
+        .addr_in(c_bus[7:0]), 
         .BRANCH(BRANCH), 
         .addr_out(next_instr_addr));
 
@@ -88,6 +87,7 @@ regFile regfle_(
                     .RST_SEL(RST_SEL), 
                     .C_SEL(C_SEL), 
                     .c_in(c_bus), 
+                    .immediate(immediate),
                     .A_SEL(A_SEL), 
                     .B_SEL(B_SEL), 
                     .MEM(MEM), 

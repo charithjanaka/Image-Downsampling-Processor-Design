@@ -238,6 +238,23 @@ begin
         end
 
         `ADDI2: begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
+
+            STATE       <=      `ADDI3;
+        end
+
+        `ADDI3: begin
             PCI         <=      1'b1;
             RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
@@ -272,8 +289,25 @@ begin
         end
 
         `ADDR2: begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
+
+            STATE       <=      `ADDR3;
+        end
+
+        `ADDR3: begin
             PCI         <=      1'b1;
-            RST_SEL         <=      `rst_none;
+            RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
             RST_IR      <=      1'b0;
             RST_PC      <=      1'b0;
@@ -306,6 +340,23 @@ begin
         end
 
         `SUBI2: begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
+
+            STATE       <=      `SUBI3;
+        end
+
+        `SUBI3: begin
             PCI         <=      1'b1;
             RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
@@ -340,6 +391,23 @@ begin
         end
 
         `SUBR2: begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
+
+            STATE       <=      `SUBR3;
+        end
+
+        `SUBR3: begin
             PCI         <=      1'b1;
             RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
@@ -374,13 +442,30 @@ begin
         end
 
         `SHL2: begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
+
+            STATE       <=      `SHL3;
+        end
+
+        `SHL3: begin
             PCI         <=      1'b1;
             RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
             RST_IR      <=      1'b0;
             RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
-            B_SEL       <=      `bsel_none;
+            B_SEL       <=      `bsel_imm;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_shl;
             IFETCH      <=      1'b0;
@@ -408,13 +493,30 @@ begin
         end
 
         `SHR2: begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
+
+            STATE       <=      `SHR3;
+        end
+
+        `SHR3: begin
             PCI         <=      1'b1;
             RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
             RST_IR      <=      1'b0;
             RST_PC      <=      1'b0;
             A_SEL       <=      instr[7:4];
-            B_SEL       <=      `bsel_none;
+            B_SEL       <=      `bsel_imm;
             C_SEL       <=      instr[7:4];
             ALU_OP      <=      `alu_shr;
             IFETCH      <=      1'b0;
@@ -481,6 +583,23 @@ begin
         end
 
         `OR2: begin
+            PCI         <=      1'b0;
+            RST_SEL     <=      `rst_none;
+            RST_ALU     <=      1'b0;
+            RST_IR      <=      1'b0;
+            RST_PC      <=      1'b0;
+            A_SEL       <=      `asel_none;
+            B_SEL       <=      `bsel_none;
+            C_SEL       <=      `csel_none;
+            ALU_OP      <=      `alu_none;
+            IFETCH      <=      1'b0;
+            MEM         <=      `mem_none;
+            BRANCH      <=      `branch_none;
+
+            STATE       <=      `OR3;
+        end
+
+        `OR3: begin
             PCI         <=      1'b1;
             RST_SEL     <=      `rst_none;
             RST_ALU     <=      1'b0;
@@ -497,22 +616,6 @@ begin
             STATE       <=      `FETCH;
         end
 
-        `NOOP: begin
-            PCI         <=      1'b0;
-            RST_SEL     <=      `rst_none;
-            RST_ALU     <=      1'b0;
-            RST_IR      <=      1'b0;
-            RST_PC      <=      1'b0;
-            A_SEL       <=      `asel_none;
-            B_SEL       <=      `bsel_none;
-            C_SEL       <=      `csel_none;
-            ALU_OP      <=      `alu_none;
-            IFETCH      <=      1'b0;
-            MEM         <=      `mem_none;
-            BRANCH      <=      `branch_none;    
-
-            STATE       <=      `FETCH;
-        end
         default: STATE  <=      `ENDP;
     endcase
 end

@@ -8,7 +8,7 @@ input wire [7:0] d_in;          // Data to be written
 input wire [1:0] MEM_WRITE;     // Memory Write control signal
 output reg [7:0] d_out;         // Data Memory Output
 
-reg [7:0] dRAM [524288:0];      // Data Memory -> 262145 bytes
+reg [7:0] dRAM [65535:0];      // Data Memory -> 262145 bytes
 
 initial begin
     dRAM[0] = 8'b00000010;

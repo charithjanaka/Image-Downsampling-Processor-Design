@@ -1,11 +1,13 @@
 // Module: Register File
+`include "ctrlsigdef.v"
 
-module regFile( clk, RST_SEL, C_SEL, c_in, A_SEL, B_SEL, MEM, mem_data, a_out, b_out, dm_addr, dm_data);
+module regFile( clk, RST_SEL, C_SEL, c_in, immediate, A_SEL, B_SEL, MEM, mem_data, a_out, b_out, dm_addr, dm_data);
 
 input wire clk;                      // Clock
 input wire [3:0] RST_SEL;            // Reset selection
 input wire [3:0] C_SEL;              // C bus selection
 input wire [18:0] c_in;              // C bus input data
+input wire [3:0] immediate;          // Immediate data
 input wire [3:0] A_SEL;              // A bus selection
 input wire [3:0] B_SEL;              // B bus selection
 input wire [1:0] MEM;                // Memory read
@@ -35,7 +37,7 @@ begin
 end
 
 assign a_out = regs[A_SEL-1];
-assign b_out = regs[B_SEL-1];
+assign b_out = (B_SEL==`bsel_imm)? immediate : regs[B_SEL-1];
 assign dm_addr = regs[0];
 assign dm_data = regs[1][7:0];
 
