@@ -7,8 +7,14 @@ module test;
 // Inputs
 
 reg clk, power_ON;
+reg [18:0] dRamAddr;
 
-top_level_module top_level_module_(clk, power_ON);
+wire processor_status;
+wire [7:0] dRamOut;
+
+integer i, file;
+
+top_level_module top_level_module_(clk, power_ON, processor_status, dRamAddr, dRamOut);
 
 // Create a 50MHz clock
 always
@@ -20,6 +26,21 @@ initial begin
 
     #10
     power_ON = 1'b1;
+
+    #460
+    file = $fopen("C:\\Users\\Charith Janaka\\Desktop\\Sem_05\\CSD\\Processor_Design\\Repository\\Verilog\\sim_src\\dramout.txt","w");
+
+    #10
+    for (i = 0; i < 11; i = i+1)
+    begin
+        @ (posedge clk)
+        dRamAddr = i;
+        $fwrite(file, "%b\n", dRamOut);
+    end
+    
+    $fclose(file);
+    $finish;
+
 end
 
 endmodule

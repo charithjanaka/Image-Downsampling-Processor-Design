@@ -19,9 +19,8 @@ output wire [7:0] dm_data;           // Data memory write data output
 
 reg [18:0] regs[13:0];
 
-always @ (MEM==2'b11)
+always @ (MEM==2'b11)                // Memory Read
 begin
-    //if (MEM == 2'b11)
     regs[1] <= {11'b0, mem_data[7:0]};
 end
 
@@ -45,10 +44,10 @@ endmodule
 
 //                                       ---------------------------------------------
 //                             clk----->|                                             |-----> a_out                  
-//                             RST----->|                                             |-----> b_out                     
-//                         RST_SEL----->|                                             |
+//                         RST_SEL----->|                                             |-----> b_out                     
+//                                      |                                             |
 //                                      |                                             |-----> dm_addr
-//                            C_EN----->|                                             |-----> dm_data
+//                                      |                                             |-----> dm_data
 //                           C_SEL----->|                                             |
 //                            c_in----->|               Register File                 |
 //                                      |                                             |
@@ -57,7 +56,7 @@ endmodule
 //                                      |                                             |
 //                        MEM_READ----->|                                             |
 //                        mem_data----->|                                             |
-//                                      |                                             |
+//                            MEM-----> |                                             |
 //                                       ---------------------------------------------
 
 

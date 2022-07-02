@@ -31,15 +31,6 @@
 `define dm_write        2'b10
 `define dm_read         2'b11
 
-// IR control signals
-`define ir_none         1'b0
-`define ir_en           1'b1
-
 // Branch control signals
 `define branch_none     1'b0
 `define branch_br       1'b1
-
-// Mux2 control signals
-`define mux2_none       2'b00
-`define mux2_reg        2'b01
-`define mux2_imm        2'b10

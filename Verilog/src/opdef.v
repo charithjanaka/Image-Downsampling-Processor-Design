@@ -1,5 +1,6 @@
 // OP Code Encoding Definitions
 
+`define IDLE        14
 `define ENDP        15
 `define FETCH       16
 `define FETCH1      17

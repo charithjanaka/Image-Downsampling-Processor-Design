@@ -2,26 +2,19 @@
 
 `include "aluopdef.v"
 
-module alu( clk, RST, ALU_OP, a_in, b_in, alu_out, z_flag);  
+module alu( ALU_OP, a_in, b_in, alu_out, z_flag);  
 
-input wire clk;
-input wire RST;
-input wire [3:0] ALU_OP;
-input wire [18:0] a_in;
-input wire [18:0] b_in;
+input wire [3:0] ALU_OP;                // ALU Operation
+input wire [18:0] a_in;                 // A-Bus input
+input wire [18:0] b_in;                 // B-Bus input
 
-output wire [18:0] alu_out;
-output wire z_flag;
+output wire [18:0] alu_out;             // ALU Output
+output wire z_flag;                     // Z-Flag
 
 reg [18:0] alu_tmp;
 
 always @ (*)
 begin
-
-    if (RST) begin
-        alu_tmp <= 19'b0;
-    end
-
     case (ALU_OP)
         `INCR:                                         
             alu_tmp <= a_in + 19'd1;
@@ -52,20 +45,12 @@ assign z_flag = (alu_tmp == 0);
 endmodule
 
 
-
-
-
-
-
-
 //                                       ---------------------------------------------
-//                             clk----->|                                             |-----> c_out                  
-//                             RST----->|                                             |-----> z_flag                     
-//                                      |                                             |
-//                          ALU_OP----->|                                             |
-//                                      |                   ALU                       |
+//                          ALU_OP----->|                                             |-----> c_out                  
+//                                      |                                             |-----> z_flag                     
 //                            a_in----->|                                             |
-//                            b_in----->|                                             |
+//                            b_in----->|                   ALU                       |
+//                                      |                                             |
 //                                      |                                             |
 //                                      |                                             |
 //                                       ---------------------------------------------

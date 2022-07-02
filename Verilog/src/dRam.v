@@ -1,6 +1,6 @@
 // Module: Data memory
 
-module dRam (clk, dAddr, d_in, MEM_WRITE, d_out);
+module dRam (clk, dAddr, d_in, MEM_WRITE, d_out, extAddr, ext_d_out);
 
 input wire clk;                 // Clock
 input wire [18:0] dAddr;        // Data Address
@@ -8,11 +8,18 @@ input wire [7:0] d_in;          // Data to be written
 input wire [1:0] MEM_WRITE;     // Memory Write control signal
 output reg [7:0] d_out;         // Data Memory Output
 
-reg [7:0] dRAM [65535:0];      // Data Memory -> 262145 bytes
+input wire [18:0] extAddr;      // Externally accessible data memory address input
+output reg [7:0] ext_d_out;     // Externally accessible data memory output
+
+reg [7:0] dRAM [255:0];          // Data Memory -> 262145 bytes
 
 initial begin
-    dRAM[0] = 8'b00000010;
-    dRAM[1] = 8'b00000011;
+    $readmemb("C:\\Users\\Charith Janaka\\Desktop\\Sem_05\\CSD\\Processor_Design\\Repository\\Verilog\\src\\draminit.txt", dRAM, 0, 9);
+end
+
+always @ (extAddr)
+begin
+    ext_d_out <= dRAM[extAddr];
 end
 
 always @ (posedge clk)
@@ -24,14 +31,15 @@ begin
 end
 endmodule
 
+
 //                                       ---------------------------------------------
 //                             clk----->|                                             |-----> d_out               
-//                                      |                                             |
+//                                      |                                             |-----> ext_d_out
 //                           dAddr----->|                                             |                    
 //                            d_in----->|               Data Memory                   |
 //                       MEM_WRITE----->|                                             |
 //                                      |                                             |
-//                                      |                                             |
+//                         extAddr----->|                                             |
 //                                       ---------------------------------------------
 
 
