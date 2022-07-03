@@ -476,10 +476,10 @@ begin
             BRANCH      <=      `branch_none;  
 
             if (z_flag == 1) begin
-                STATE   <=      `JPNZ2;
+                STATE   <=      `FETCH;
             end
             else begin
-                STATE   <=      `FETCH;
+                STATE   <=      `JPNZ2;
             end
         end
 

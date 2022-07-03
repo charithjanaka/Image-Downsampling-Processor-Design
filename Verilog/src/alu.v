@@ -35,7 +35,7 @@ begin
         `ABUS:                                        
             alu_tmp <= a_in;
         default:
-            alu_tmp <= 19'b0; 
+            alu_tmp <= alu_tmp;
     endcase
 end
 
