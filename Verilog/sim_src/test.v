@@ -12,7 +12,7 @@ reg [18:0] dRamAddr;
 wire processor_status;
 wire [7:0] dRamOut;
 
-integer i, file;
+integer i, j, file;
 
 top_level_module top_level_module_(clk, power_ON, processor_status, dRamAddr, dRamOut);
 
@@ -26,18 +26,29 @@ initial begin
 
     #10
     power_ON = 1'b1;
+    #50
+    power_ON = 1'b0;
 
-    #62500000
+    #669650
     file = $fopen("C:\\Users\\Charith Janaka\\Desktop\\Sem_05\\CSD\\Processor_Design\\Repository\\Verilog\\sim_src\\dramout.txt","w");
 
     #10
-    for (i = 140; i < 271; i = i+1)
+    /*for (i = 0; i < 155; i=i+1)
     begin
         @ (posedge clk)
         dRamAddr = i;
         $fwrite(file, "%d\n", dRamOut);
+    end*/
+    for (j = 0; j < 10; j = j+1)
+    begin
+        for (i = 23; i < 34; i = i+1)//22 35
+        begin
+            @ (posedge clk)
+            dRamAddr = i+(j*12);
+            $fwrite(file, "%d ", dRamOut);
+        end
+        $fwrite(file, "\n");
     end
-    
     $fclose(file);
     $finish;
 
