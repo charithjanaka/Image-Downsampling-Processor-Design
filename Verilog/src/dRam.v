@@ -11,7 +11,7 @@ output reg [7:0] d_out;         // Data Memory Output
 input wire [18:0] extAddr;      // Externally accessible data memory address input
 output reg [7:0] ext_d_out;     // Externally accessible data memory output
 
-reg [7:0] dRAM [16910:0];          // Data Memory -> 262145 bytes
+reg [7:0] dRAM [67000:0];       // Data Memory -> 67001 bytes
 
 initial begin
     $readmemb("C:\\Users\\Charith Janaka\\Desktop\\Sem_05\\CSD\\Processor_Design\\Repository\\Verilog\\src\\draminit.txt", dRAM);

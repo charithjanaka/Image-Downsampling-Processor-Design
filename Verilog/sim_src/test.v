@@ -29,7 +29,7 @@ initial begin
     #50
     power_ON = 1'b0;
 
-    #669650
+    #262000000
     file = $fopen("C:\\Users\\Charith Janaka\\Desktop\\Sem_05\\CSD\\Processor_Design\\Repository\\Verilog\\sim_src\\dramout.txt","w");
 
     #10
@@ -39,12 +39,12 @@ initial begin
         dRamAddr = i;
         $fwrite(file, "%d\n", dRamOut);
     end*/
-    for (j = 0; j < 10; j = j+1)
+    for (j = 0; j < 128; j = j+1)
     begin
-        for (i = 23; i < 34; i = i+1)//22 35
+        for (i = 269; i < 398; i = i+1)//23 29
         begin
             @ (posedge clk)
-            dRamAddr = i+(j*12);
+            dRamAddr = i+(j*258);//12
             $fwrite(file, "%d ", dRamOut);
         end
         $fwrite(file, "\n");
