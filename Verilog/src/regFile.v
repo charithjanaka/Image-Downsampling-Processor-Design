@@ -1,4 +1,5 @@
 // Module: Register File
+
 `include "ctrlsigdef.v"
 
 module regFile( clk, RST_SEL, C_SEL, c_in, immediate, A_SEL, B_SEL, MEM, mem_data, a_out, b_out, dm_addr, dm_data);
@@ -58,12 +59,3 @@ endmodule
 //                        mem_data----->|                                             |
 //                            MEM-----> |                                             |
 //                                       ---------------------------------------------
-
-
-// 0 - DMAR
-// 1 - DMDR
-// 2 - R0
-// 3 - R1
-// :
-// :
-// 13 - R11

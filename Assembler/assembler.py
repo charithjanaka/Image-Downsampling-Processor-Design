@@ -16,7 +16,7 @@ REG = {"DMAR":"0001", "DMDR":"0010", "R0":"0011", "R1":"0100", "R2":"0101", "R3"
 instrs = []
 
 # Reading Assembly Code
-AssemblyCode = open("lowpassFiltering.txt","r")
+AssemblyCode = open("Main.txt","r")
 instrs = AssemblyCode.read().splitlines() 
 
 # Generating Machine Code
